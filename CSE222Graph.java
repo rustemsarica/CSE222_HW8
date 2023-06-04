@@ -1,48 +1,57 @@
 import java.util.*;
 
 public class CSE222Graph {
-    
-    List<List<Integer>> graph; 
-    
+    private int[][] matrix;
+    private ArrayList<Node> nodes;
     int numRows;
     int numCols;
-    int startX, startY, endX, endY;
+    int startX,startY;
+    int endX,endY;
+    Node startNode;
+    Node targetNode;
 
     public CSE222Graph(CSE222Map map) {
-        this.graph = new ArrayList<>();
+        this.matrix = map.map;
         this.numRows = map.map.length;
-        this.numCols = map.map[0].length;
-
+        this.numCols = map.map[1].length;
+        this.nodes = new ArrayList<>();
         this.startX = map.startX;
         this.startY = map.startY;
         this.endX = map.endX;
         this.endY = map.endY;
-    
-        int numNodes = numRows * numCols;
+        this.startNode = new Node(map.startX * map.map[1].length + map.startY);
+        this.targetNode = new Node(map.endX * map.map[1].length + map.endY);
+        initializeGraph();
+    }
 
-        for (int i = 0; i < numNodes; i++) {
-            this.graph.add(new ArrayList<>());
+    private void initializeGraph() {
+
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                
+                Node node = new Node(i * numCols + j);
+                nodes.add(node);
+                
+            }
         }
 
         int[] colOffsets = {-1, 1, 0, 0,-1,-1, 1, 1};
         int[] rowOffsets = {0, 0, -1, 1,-1, 1, 1,-1};
 
-        for (int row = 0; row < numRows; row++) {
-            for (int col = 0; col < numCols; col++) {
-                if (map.map[row][col] == 1) {
-                    continue;
-                }
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                if (matrix[i][j] == 0) {
+                    Node currentNode = getNode(i, j);
 
-                int currentNode = row * numCols + col;
-
-                for (int i = 0; i < 8; i++) {
-                    int newRow = row + rowOffsets[i];
-                    int newCol = col + colOffsets[i];
-
-                    if (isValidCell(newRow, newCol) && map.map[newRow][newCol] == 0) {
-                        int adjacentNode = newRow * numCols + newCol;
-                        graph.get(currentNode).add(adjacentNode);
-                    }
+                    for (int offset = 0; offset < 8; offset++) {
+                        int newRow = i + rowOffsets[offset];
+                        int newCol = j + colOffsets[offset];
+    
+                        if (isValidCell(newRow, newCol) && matrix[newRow][newCol] == 0) {
+                            Node neigbor = getNode(newRow, newCol);
+                            currentNode.addNeighbor(neigbor);
+                        }
+                    }                    
                 }
             }
         }
@@ -52,13 +61,11 @@ public class CSE222Graph {
         return row >= 0 && row < numRows && col >= 0 && col < numCols;
     }
 
-    public void addEdge(int source, int destination) {
-        graph.get(source).add(destination);
-        graph.get(destination).add(source); 
+    private Node getNode(int row, int col) {
+        return nodes.get(row * numCols + col);
     }
 
-    public List<Integer> get(int vertex) {
-        return graph.get(vertex);
+    public ArrayList<Node> getNodes() {
+        return nodes;
     }
-
 }

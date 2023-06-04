@@ -34,7 +34,11 @@ public class CSE222Map {
 				else if(lineNumber > 1)
 				{
 					for(int i=0; i<coordinates.length; i++ ){
-						this.map[i][lineNumber-2] = Integer.parseInt(coordinates[i]);
+                        int coordinate = Integer.parseInt(coordinates[i]);
+                        if(coordinate==-1){
+                            coordinate = 1;
+                        }
+						this.map[i][lineNumber-2] = coordinate;
 					}
 
 				}
@@ -64,12 +68,12 @@ public class CSE222Map {
                 }
             }
         }
-        writeImage(image);
+        writeImage(image, "map");
         g.dispose();
     }
 
-    public void writeImage(BufferedImage image){
-        File output = new File("grafik.png");
+    public void writeImage(BufferedImage image , String name){
+        File output = new File(name+".png");
         try {
             ImageIO.write(image, "png", output);
         } catch (IOException e) {
@@ -77,7 +81,7 @@ public class CSE222Map {
         }
     }
 
-    public void drawLine(List<Integer> list)
+    public void drawLine(List<Node> list, String fileName)
     {
         int width = map[0].length;
         int height = map[1].length;
@@ -95,24 +99,24 @@ public class CSE222Map {
             }
         }
         
-        for (int node : list) {
-            int row = node / map[0].length;
-            int col = node % map[0].length;
+        for (Node node : list) {
+            int row = node.getData() / map[0].length;
+            int col = node.getData() % map[0].length;
             image.setRGB(row, col, Color.BLUE.getRGB());
         }
-        writeImage(image);
+        writeImage(image,fileName);
         g.dispose();
     }
 
-    public void writePath(List<Integer> list)
+    public void writePath(List<Node> list, String fileName)
     {
-        String filePath = "veriler.txt";
+        String filePath = fileName+".txt";
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
 
-            for (int node : list) {
-                int row = node / map[0].length;
-                int col = node % map[0].length;
+            for (Node node : list) {
+                int row = node.getData() / map[0].length;
+                int col = node.getData() % map[0].length;
                 writer.write(row+","+col);
                 writer.newLine();
             }

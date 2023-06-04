@@ -1,7 +1,7 @@
 import java.util.*;
 
 public class CSE222BFS {
-    private Graph graph;
+    private CSE222Graph graph;
     
     private ArrayList<Node> visitedNodes;
     private ArrayList<Node> shortestPath;
@@ -10,16 +10,15 @@ public class CSE222BFS {
     int length;
 
 
-    public CSE222BFS(Graph graph) 
+    public CSE222BFS(CSE222Graph graph) 
     {
         this.graph = graph;
-        this.startNode = graph.startNode;
-        this.targetNode = graph.targetNode;
+        this.startNode = graph.getNodes().get(graph.startX * graph.numCols + graph.startY);
+        this.targetNode = graph.getNodes().get(graph.endX * graph.numCols + graph.endY);
         this.length = 0;
     }
 
     public List<Node> findPath(){
-        System.out.println(startNode.getNeighbors());
         visitedNodes = new ArrayList<>();
         shortestPath = new ArrayList<>();
 

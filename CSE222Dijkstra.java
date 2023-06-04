@@ -3,7 +3,7 @@ import java.util.*;
     
 public class CSE222Dijkstra {
 
-    private List<List<Integer>> graph;
+    private CSE222Graph graph;
     private int numRows;
     private int numCols;
     private int startX, startY, endX, endY;
@@ -12,7 +12,7 @@ public class CSE222Dijkstra {
 
     public CSE222Dijkstra(CSE222Graph graph) 
     {
-        this.graph = graph.graph;
+        this.graph = graph;
         this.numRows = graph.numRows;
         this.numCols = graph.numCols;
         
@@ -23,7 +23,7 @@ public class CSE222Dijkstra {
         this.length = 0;
     }
 
-    public List<Integer> findPath() 
+    public List<Node> findPath() 
     {
         int startNode = startX * numCols + startY;
         int endNode = endX * numCols + endY;
@@ -38,31 +38,33 @@ public class CSE222Dijkstra {
 
         PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(node -> node.distance));
 
-        pq.offer(new Node(startNode, 0));
+        pq.offer(new Node(startNode));
 
         while (!pq.isEmpty()) {
             Node currentNode = pq.poll();
 
-            if (currentNode.node == endNode) {
+            if (currentNode.getData() == endNode) {
                 break;
             }
 
-            if (currentNode.distance > distances[currentNode.node]) {
+            if (currentNode.distance > distances[currentNode.getData()]) {
                 continue; 
             }
 
-            for (int adjacentNode : graph.get(currentNode.node)) {
+            for (Node adjacentNode : graph.getNodes().get(currentNode.getData()).getNeighbors()) {
                 int newDistance = currentNode.distance + 1;
 
-                if (newDistance < distances[adjacentNode]) {
-                    distances[adjacentNode] = newDistance;
-                    previous[adjacentNode] = currentNode.node;
-                    pq.offer(new Node(adjacentNode, newDistance));
+                if (newDistance < distances[adjacentNode.getData()]) {
+                    distances[adjacentNode.getData()] = newDistance;
+                    previous[adjacentNode.getData()] = currentNode.getData();
+                    Node newNode = new Node(adjacentNode.getData());
+                    newNode.distance = newDistance;
+                    pq.offer(newNode);
                 }
             }
         }
 
-        List<Integer> path = buildPath(previous, endNode);
+        List<Node> path = buildPath(previous, endNode);
         if(path.isEmpty()){
             System.out.println("No feasible path is found.");
         }
@@ -70,26 +72,16 @@ public class CSE222Dijkstra {
         return path;
     }
 
-    private List<Integer> buildPath(int[] previous, int endNode) {
-        List<Integer> path = new ArrayList<>();
-        int currentNode = endNode;
+    private List<Node> buildPath(int[] previous, int endNode) {
+        List<Node> path = new ArrayList<>();
+        Node currentNode = new Node(endNode);
 
-        while (currentNode != -1) {
+        while (currentNode.getData() != -1) {
             path.add(0, currentNode);
-            currentNode = previous[currentNode];
+            currentNode = new Node(previous[currentNode.getData()]);
         }
         this.length=path.size();
         return path;
-    }
-
-    private class Node {
-        int node;
-        int distance;
-
-        public Node(int node, int distance) {
-            this.node = node;
-            this.distance = distance;
-        }
     }
 
 }
